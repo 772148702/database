@@ -102,8 +102,10 @@ public class Node {
             int l = entries.size()/2+entries.size()%2;
             int r = entries.size()/2;
 
-            for (int i=0;i<l;i++)
+            for (int i=0;i<l;i++) {
                 left.entries.add(this.entries.get(i));
+
+            }
             for (int i=0;i<r;i++)
                 right.entries.add(this.entries.get(l+i));
 
@@ -116,15 +118,19 @@ public class Node {
                 parent.children.add(lo, left);
                 left.parent = parent;
                 updateNoRecursive(parent);
-                checkOverflow(parent, tree);
+               Node tmp =  checkOverflow(parent, tree);
+               //right.parent = left.parent = tmp;
+
             } else
             {
                 Node root = new Node(false,true);
                 tree.root = root;
-                root.children.add(left);
-                right.parent = root;
-                root.children.add(right);
                 left.parent = root;
+                right.parent = root;
+                root.children.add(left);
+
+                root.children.add(right);
+
                 root.parent = null;
                 updateNoRecursive(root);
             }
@@ -153,7 +159,8 @@ public class Node {
     }
     void updateNoRecursive(Node node)
     {
-
+        if(node==null) return;
+        if(node.entries!=null)
         node.entries.clear();
         for(Node son:node.children)
         {
@@ -163,34 +170,40 @@ public class Node {
 
     }
 
-    void checkOverflow(Node node,BplusTree tree)
+    Node checkOverflow(Node node,BplusTree tree)
     {
-        if(node.isRoot==true&&node.entries.size()>tree.order)
+        if(node.isRoot==true&&node.children.size()>tree.order)
         {
             Node left = new Node(false,false);
             Node right = new Node(false,false);
             Node root = new Node(false,true);
-            int l = tree.order/2+tree.order%2;
-            int r = tree.order/2;
+            int l = node.entries.size()/2+node.entries.size()%2;
+            int r = node.entries.size()/2;
 
 
-            for (int i=0;i<l;i++)
-                left.entries.add(node.entries.get(i));
-            for (int i=0;i<r;i++)
-                right.entries.add(node.entries.get(l+i));
-
-            int lo = node.parent.children.indexOf(node);
+            for (int i=0;i<l;i++) {
+                left.children.add(node.children.get(i));
+                node.children.get(i).parent = left;
+            }
+            for (int i=0;i<r;i++) {
+                right.children.add(node.children.get(l + i));
+                node.children.get(i+l).parent = right;
+            }
+          updateNoRecursive(left);
+          updateNoRecursive(right);
+         //   int lo = node.parent.children.indexOf(node);
           //  node.parent.children.remove(node);
-            root.children.add(lo,right);
+            root.children.add(left);
             right.parent = root;
-            root.children.add(lo,left);
+            root.children.add(right);
             left.parent = root;
 
-            updateNoRecursive(node.parent);
-            tree.head = root;
+            updateNoRecursive(root);
+            tree.root = root;
+            return root;
         }
 
-        if(node.entries.size()>tree.order)
+        if(node.children.size()>tree.order)
         {
             Node left = new Node(false,false);
             Node right = new Node(false,false);
@@ -199,9 +212,9 @@ public class Node {
             int r = tree.order/2;
 
             for (int i=0;i<l;i++)
-                left.entries.add(node.entries.get(i));
+                left.children.add(node.children.get(i));
             for (int i=0;i<r;i++)
-                right.entries.add(node.entries.get(l+i));
+                right.children.add(node.children.get(l+i));
 
             int lo = node.parent.children.indexOf(node);
             node.parent.children.remove(node);
@@ -211,19 +224,30 @@ public class Node {
             left.parent = node.parent;
             updateNoRecursive(node.parent);
             checkOverflow(node.parent,tree);
+            return node;
         }
-
+    return node;
     }
 
     @Override
     public String toString() {
+        if(this.parent!=null)
         return "Node{" +
                 "isRoot=" + isRoot +
                 ", isLeaf=" + isLeaf +
-
+                ",parent="+parent.hashCode()+
                 ", entries=" + entries +
-                ", children=" + children +
+
                 '}';
+        else
+        return "Node{" +
+                "isRoot=" + isRoot +
+                ", isLeaf=" + isLeaf +
+             //   ",parent="+parent+
+                ", entries=" + entries +
+
+                '}';
+
     }
 
     void release()
