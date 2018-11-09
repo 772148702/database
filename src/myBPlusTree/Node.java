@@ -9,15 +9,11 @@ import java.util.Map.Entry;
 public class Node {
     boolean isRoot;
     boolean isLeaf;
-
     protected Node parent;
-
     /** 叶节点的前节点*/
     protected Node previous;
-
     /** 叶节点的后节点*/
     protected  Node next;
-
     /** 节点的关键字 */
     /**
      * 按照从小到大的关系进行排列，父节点取子节点中最大的关键字作为键值。
@@ -117,7 +113,7 @@ public class Node {
                 right.parent = parent;
                 parent.children.add(lo, left);
                 left.parent = parent;
-                updateNoRecursive(parent);
+                update(parent);
                Node tmp =  checkOverflow(parent, tree);
                //right.parent = left.parent = tmp;
 
@@ -197,7 +193,7 @@ public class Node {
             right.parent = root;
             root.children.add(right);
             left.parent = root;
-
+            node.release();
             updateNoRecursive(root);
             tree.root = root;
             return root;
@@ -208,14 +204,19 @@ public class Node {
             Node left = new Node(false,false);
             Node right = new Node(false,false);
 
-            int l = tree.order/2+tree.order%2;
-            int r = tree.order/2;
+            int l =  node.entries.size()/2+ node.entries.size()%2;
+            int r =  node.entries.size()/2;
 
-            for (int i=0;i<l;i++)
+            for (int i=0;i<l;i++) {
                 left.children.add(node.children.get(i));
-            for (int i=0;i<r;i++)
-                right.children.add(node.children.get(l+i));
-
+                node.children.get(i).parent = left;
+            }
+            for (int i=0;i<r;i++) {
+                right.children.add(node.children.get(l + i));
+                node.children.get(i+l).parent = right;
+            }
+            updateNoRecursive(left);
+            updateNoRecursive(right);
             int lo = node.parent.children.indexOf(node);
             node.parent.children.remove(node);
             node.parent.children.add(lo,right);
@@ -233,6 +234,7 @@ public class Node {
     public String toString() {
         if(this.parent!=null)
         return "Node{" +
+                "this"+this.hashCode()+
                 "isRoot=" + isRoot +
                 ", isLeaf=" + isLeaf +
                 ",parent="+parent.hashCode()+
@@ -241,7 +243,8 @@ public class Node {
                 '}';
         else
         return "Node{" +
-                "isRoot=" + isRoot +
+                "this"+this.hashCode()+
+                ",isRoot=" + isRoot +
                 ", isLeaf=" + isLeaf +
              //   ",parent="+parent+
                 ", entries=" + entries +
