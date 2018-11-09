@@ -51,7 +51,27 @@ public class Node {
         if(node.isRoot==false)
         update(node.parent);
     }
+    //根据键值来进行查找。
+    Object search(Comparable key)
+    {
+        if(isLeaf){
+            for(Entry entry:entries){
+                if(key.compareTo(entry.getKey())==0)
+                {
+                    return entry.getValue();
+                }
+            }
+        }
 
+        for(Entry entry:entries)
+        {
+            if(key.compareTo(entry.getKey())<=0) {
+                int i = entries.indexOf(entry);
+                return children.get(i).search(key);
+            }
+        }
+        return children.get(children.size()-1).search(key);
+    }
     void insertNode(Comparable key,Object obj,BplusTree tree)
     {
         //在树的叶子节点的部位，可以直接插入
@@ -91,10 +111,16 @@ public class Node {
             Node left = new Node(true,false);
             Node right = new Node(true,false);
             left.previous = this.previous;
+            if(this.previous!=null)
+            this.previous.next = left;
             left.next = right;
             right.previous = left;
             right.next = this.next;
-
+            if(this.next!=null)
+            this.next.previous = right;
+            if(this.previous==null) {
+                tree.head = left;
+            }
             int l = entries.size()/2+entries.size()%2;
             int r = entries.size()/2;
 

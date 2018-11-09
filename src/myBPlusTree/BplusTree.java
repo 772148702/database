@@ -21,7 +21,10 @@ public class BplusTree {
         root.insertNode(key,obj,this);
     }
 
-
+  Object search(Comparable key)
+  {
+      return root.search(key);
+  }
     BplusTree(int order)
     {
         this.order = order;
@@ -51,5 +54,17 @@ public class BplusTree {
                 }
             }
         }
+    }
+
+    void printList()
+    {
+        Node tmp = head;
+        StringBuffer  sb = new StringBuffer();
+        while(tmp!=null)
+        {
+            sb.append(tmp+"-->");
+            tmp = tmp.next;
+        }
+        System.out.println(sb.toString());
     }
 }
