@@ -1,12 +1,13 @@
 package myBPlusTree;
 
+import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-public class Node {
+public class Node implements Serializable{
     boolean isRoot;
     boolean isLeaf;
     protected Node parent;

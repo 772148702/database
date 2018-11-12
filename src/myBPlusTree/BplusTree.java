@@ -1,11 +1,14 @@
 package myBPlusTree;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class BplusTree {
+public class BplusTree implements Serializable{
+
+
 
     protected  Node root;
 
@@ -71,4 +74,6 @@ public class BplusTree {
         }
         System.out.println(sb.toString());
     }
+
+
 }
