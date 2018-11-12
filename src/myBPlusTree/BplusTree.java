@@ -25,6 +25,10 @@ public class BplusTree {
   {
       return root.search(key);
   }
+  void remove(Comparable key)
+  {
+      root.remove(key,this);
+  }
     BplusTree(int order)
     {
         this.order = order;
